@@ -1,7 +1,8 @@
 $(document).ready(function() {
   var roomNames = {};
-  var friends = {};
+
   
+//function to output all messages for data object
   var outputMessages = function(data) {
     for (var i = 0; i < data.results.length; i++) {
       var $container = $('<div class="chat"></div>');
@@ -21,6 +22,19 @@ $(document).ready(function() {
     }
   };
   
+  // need to add this functionality when you change pages
+  var friendAdder = function(event) {
+    var name = $(this).context.innerText;
+    var usernames = $('.username');
+    for (var i = 0; i < usernames.length; i++) {
+      if (usernames[i].innerHTML === name) {
+        console.log(usernames.eq([i]).text());
+        usernames.eq([i]).toggleClass('friends');
+      }
+    }
+  };
+  
+//generate all the rooms names
   $.ajax({
     url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
     type: 'GET',
@@ -35,17 +49,15 @@ $(document).ready(function() {
           $('select').append($newRoom);
         }
       }
-      outputMessages(data);  
-    },
-    error: function (data) {
-      console.error('chatterbox: Failed to send message', data);
+      outputMessages(data);
+      
+      $('.username').on('click', friendAdder);   
     }
   });
   
   
   //filters messages by room when changed in drop down
   $('.roomNames').change(function() {
-    console.log('changed');
     var room = $(this).val();
     var url = `http://parse.sfm8.hackreactor.com/chatterbox/classes/messages/?where={"roomname":"${room}"}`;
     $.ajax({
@@ -55,6 +67,7 @@ $(document).ready(function() {
       success: function (data) {
         $('#chats').html('');
         outputMessages(data);
+        $('.username').on('click', friendAdder); 
       },
       error: function (data) {
         console.error('error');
@@ -73,27 +86,28 @@ $(document).ready(function() {
       text: text,
       roomname: room
     };
-    
+  
+  //add a new message
     $.ajax({
       url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
       type: 'POST',
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
-        var $container = $('<div class="container"></div>');
+        var $container = $('<div class="chat"></div>');
         var $message = $('<div class="message"></div>');
-        var $name = $('<div class="name"></div>');
+        var $name = $('<div class="username"></div>');
         var $time = $('<div class="time"></div>');
       
         $message.text(text);
         $name.text('Dandrew');
         $time.text(new Date().toLocaleString());
       
-      //insert the message text into our container div
         $('#chats').prepend($container);
         $container.append($name);
         $container.append($message);
         $container.append($time);
+        $('.username').on('click', friendAdder); 
         
       },
       error: function (data) {
@@ -112,19 +126,5 @@ $(document).ready(function() {
       $('#chats').html('');
     }
   }); 
-  
-  $('div.username').on('click', function(event) {
-    console.log('asdf');
-    event.preventDefault();
-    var name = $(this).val();
-  }); 
-  
+
 });
-  
-  //sort by time
-  //moment.js library
-
-
-
-
-

@@ -83,15 +83,9 @@ form input[type=text] {
     padding: 10px;
 }
 
-.friend {
-    color: #fff;
-    background-color: #0090da;
-}
-
-.container {
-    height:  100px;
-    background-color: orange;
-    margin: 10px 0;
+.friends {
+    color: red;
+    
 }
 
 .username:hover {
