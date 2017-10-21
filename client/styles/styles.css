@@ -36,13 +36,14 @@ form input[type=text] {
 }
 
 .chat {
-    padding: 15px;
-    margin-bottom: 10px;
+    padding: 20px 30px;
+    margin-bottom: 20px;
     background-color: #bdc3c7;
     border-radius: 20px;
     height: 150px;
     font-size: 1.3em;
     overflow-y: scroll;
+    transition: all 0.2s;
 }
     
 
@@ -51,6 +52,7 @@ form input[type=text] {
     max-width: 100%;
     overflow: hidden;
     width: auto;
+    position: relative;
 }
 
 .chat:hover {
@@ -59,10 +61,16 @@ form input[type=text] {
 
 
 .friends {
-    color: red;
+    -webkit-box-shadow: 1px 1px 20px 2px rgba(0,0,0,1);
+    -moz-box-shadow: 1px 1px 20px 2px rgba(0,0,0,1);
+    box-shadow: 1px 1px 20px 2px rgba(0,0,0,1);
 }
-
-.username:hover {
+.name {
+    transition: all 0.2s;
+    font-style: italic;
+    font-size: .9em;
+}
+.name:hover {
     color: #e67e22;
     cursor: pointer;
 }
@@ -77,4 +85,15 @@ select {
 
 .textbox {
     min-width: 65%;
+}
+
+.time {
+    position: relative;
+    bottom: -35px;
+    font-size: .8em;
+}
+
+.message {
+    position: relative;
+    bottom: -15px;
 }

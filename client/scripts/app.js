@@ -7,16 +7,16 @@ $(document).ready(function() {
     for (var i = 0; i < data.results.length; i++) {
       var $container = $('<div class="chat"></div>');
       var $message = $('<div class="message"></div>');
-      var $name = $('<div class="username"></div>');
+      var $name = $('<div class="username"><span class="name"></span></div>');
       var $time = $('<div class="time"></div>');
       
       $message.text(data.results[i].text);
-      $name.text(data.results[i].username);
+      $name.find('.name').text(data.results[i].username);
       var time = moment(data.results[i].createdAt).startOf('min').fromNow();
       $time.text(time);
       
       //insert the message text into our container div
-      $('#chats').prepend($container);
+      $('#chats').append($container);
       $container.append($name);
       $container.append($message);
       $container.append($time);
@@ -27,18 +27,20 @@ $(document).ready(function() {
     var name = $(this).context.innerText;
     var usernames = $('.username');
     for (var i = 0; i < usernames.length; i++) {
-      if (usernames[i].innerHTML === name) {
-        usernames.eq([i]).next().toggleClass('friends');
+      if (usernames.eq([i]).find('.name')['0'].innerHTML === name) {
+        usernames.eq([i]).closest('.chat').toggleClass('friends');
       }
     }
   };
   
 //generate all the rooms names and original messages
   $.ajax({
-    url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages?order=-createdAt',
+    url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages/',
     type: 'GET',
     contentType: 'application/json',
+    data: {order: '-createdAt'},
     success: function (data) {
+      console.log(data);
       for (var i = 0; i < data.results.length; i++) {
         var room = data.results[i].roomname;
         if (!roomNames[room] && room) {
@@ -49,24 +51,28 @@ $(document).ready(function() {
       }
       outputMessages(data);
       
-      $('.username').on('click', friendAdder);   
+      $('.name').on('click', friendAdder);   
     },
     error: function(data) {
       console.log('failed to get request', data);
     }
 
   });
-  
+  //// trying to refactor to data object
   //filters messages by room when changed in drop down
   $('.roomNames').change(function() {
     $.ajax({
-      url: `http://parse.sfm8.hackreactor.com/chatterbox/classes/messages/?where={"roomname":"${$(this).val()}"}&order=-createdAt`,
+      url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages/',
       type: 'GET',
       contentType: 'application/json',
+      data: { 
+        'where': {'roomname': $(this).val()},
+        'order': '-createdAt' 
+      },
       success: function (data) {
         $('#chats').html('');
         outputMessages(data);
-        $('.username').on('click', friendAdder); 
+        $('.name').on('click', friendAdder); 
       },
       error: function (data) {
         console.error('error');
@@ -91,18 +97,18 @@ $(document).ready(function() {
       success: function (data) {
         var $container = $('<div class="chat"></div>');
         var $message = $('<div class="message"></div>');
-        var $name = $('<div class="username"></div>');
+        var $name = $('<div class="username"><span class="name"></span></div>');
         var $time = $('<div class="time"></div>');
       
         $message.text($('input[type="text"]').val());
-        $name.text('Dandrew');
+        $name.find('.name').text('Dandrew');
         $time.text(moment().startOf('min').fromNow());
       
         $('#chats').prepend($container);
         $container.append($name);
         $container.append($message);
         $container.append($time);
-        $('.username').on('click', friendAdder); 
+        $('.name').on('click', friendAdder); 
         $('input[type="text"]').val(''); 
       },
       error: function (data) {
