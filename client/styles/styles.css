@@ -94,3 +94,7 @@ form input[type=text] {
     margin: 10px 0;
 }
 
+.username:hover {
+    color: blue;
+    cursor: pointer;
+}
