@@ -12,7 +12,8 @@ $(document).ready(function() {
       
       $message.text(data.results[i].text);
       $name.text(data.results[i].username);
-      $time.text(data.results[i].createdAt);
+      var time = moment(data.results[i].createdAt).startOf('min').fromNow();
+      $time.text(time);
       
       //insert the message text into our container div
       $('#chats').prepend($container);
@@ -21,26 +22,23 @@ $(document).ready(function() {
       $container.append($time);
     }
   };
-  
-  // need to add this functionality for when you change pages
+  //turns all messages into red when clicking on a username
   var friendAdder = function(event) {
     var name = $(this).context.innerText;
     var usernames = $('.username');
     for (var i = 0; i < usernames.length; i++) {
       if (usernames[i].innerHTML === name) {
         usernames.eq([i]).next().toggleClass('friends');
-        //var currentMessage = usernames.eq([i]).next();
       }
     }
   };
   
-//generate all the rooms names
+//generate all the rooms names and original messages
   $.ajax({
-    url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
+    url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages?order=-createdAt',
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
-      // iterate over all objects in array
       for (var i = 0; i < data.results.length; i++) {
         var room = data.results[i].roomname;
         if (!roomNames[room] && room) {
@@ -59,13 +57,10 @@ $(document).ready(function() {
 
   });
   
-  
   //filters messages by room when changed in drop down
   $('.roomNames').change(function() {
-    var room = $(this).val();
-    var url = `http://parse.sfm8.hackreactor.com/chatterbox/classes/messages/?where={"roomname":"${room}"}`;
     $.ajax({
-      url: url,
+      url: `http://parse.sfm8.hackreactor.com/chatterbox/classes/messages/?where={"roomname":"${$(this).val()}"}&order=-createdAt`,
       type: 'GET',
       contentType: 'application/json',
       success: function (data) {
@@ -80,17 +75,13 @@ $(document).ready(function() {
   });
   
   //submits the message to the server
-  $('input[type="submit"]').on('click', function(event) {
+  $('.new-room-btn').on('click', function(event) {
     event.preventDefault();
-    var text = $('input[type="text"]').val();
-    $('input[type="text"]').val('');
-    var room = $('.roomNames').val();
     var message = {
       username: 'Dandrew',
-      text: text,
-      roomname: room
+      text: $('input[type="text"]').val(),
+      roomname: $('.roomNames').val()
     };
-  
   //add a new message
     $.ajax({
       url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
@@ -103,16 +94,16 @@ $(document).ready(function() {
         var $name = $('<div class="username"></div>');
         var $time = $('<div class="time"></div>');
       
-        $message.text(text);
+        $message.text($('input[type="text"]').val());
         $name.text('Dandrew');
-        $time.text(new Date().toLocaleString());
+        $time.text(moment().startOf('min').fromNow());
       
         $('#chats').prepend($container);
         $container.append($name);
         $container.append($message);
         $container.append($time);
         $('.username').on('click', friendAdder); 
-        
+        $('input[type="text"]').val(''); 
       },
       error: function (data) {
         console.error('chatterbox: failed to send new message', data);
