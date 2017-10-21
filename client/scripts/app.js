@@ -22,14 +22,14 @@ $(document).ready(function() {
     }
   };
   
-  // need to add this functionality when you change pages
+  // need to add this functionality for when you change pages
   var friendAdder = function(event) {
     var name = $(this).context.innerText;
     var usernames = $('.username');
     for (var i = 0; i < usernames.length; i++) {
       if (usernames[i].innerHTML === name) {
-        console.log(usernames.eq([i]).text());
-        usernames.eq([i]).toggleClass('friends');
+        usernames.eq([i]).next().toggleClass('friends');
+        //var currentMessage = usernames.eq([i]).next();
       }
     }
   };
@@ -52,7 +52,11 @@ $(document).ready(function() {
       outputMessages(data);
       
       $('.username').on('click', friendAdder);   
+    },
+    error: function(data) {
+      console.log('failed to get request', data);
     }
+
   });
   
   
