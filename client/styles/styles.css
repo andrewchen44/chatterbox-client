@@ -23,7 +23,7 @@ body {
 }
 
 form {
-    padding: 20px;
+    padding: 10px;
     padding-left: 0;
     margin-bottom: 10px;
 }
@@ -96,4 +96,11 @@ select {
 .message {
     position: relative;
     bottom: -15px;
+}
+
+.exit-btn {
+    padding-left: 3px;
+    position: absolute;
+    top: -1px;
+    right: -1px;
 }

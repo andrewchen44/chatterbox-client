@@ -1,9 +1,36 @@
 $(document).ready(function() {
   var roomNames = {};
-
+  var tabs = {};
+//generate messages based on room name
+  var generateMessages = function(roomName) {
+    $.ajax({
+      url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages/',
+      type: 'GET',
+      contentType: 'application/json',
+      data: { 
+        'where': {'roomname': roomName},
+        'order': '-createdAt' 
+      },
+      success: function (data) {
+        $('#chats').html('');
+        if (!tabs[roomName]) {
+          tabs[roomName] = roomName;
+          $('#tabs').append(`<button type="button" class="btn btn-secondary ${roomName} tab-btn">${roomName}<i class="fa fa-window-close" aria-hidden="true"></i></button>`);
+          $('.fa').on('click', function(event) {
+            $(this).parent().remove();
+            $('#chats').html('');
+          });
+          $(`.${roomName}`).on('click', function(event) {
+            generateMessages(roomName);
+          });
+        }
+        outputMessages(data, roomName);
+      }
+    });
+  };
   
 //function to output all messages for data object
-  var outputMessages = function(data) {
+  var outputMessages = function(data, roomName) {
     for (var i = 0; i < data.results.length; i++) {
       var $container = $('<div class="chat"></div>');
       var $message = $('<div class="message"></div>');
@@ -49,7 +76,7 @@ $(document).ready(function() {
           $('select').append($newRoom);
         }
       }
-      outputMessages(data);
+      //outputMessages(data);
       
       $('.name').on('click', friendAdder);   
     },
@@ -58,26 +85,12 @@ $(document).ready(function() {
     }
 
   });
-  //// trying to refactor to data object
+
   //filters messages by room when changed in drop down
   $('.roomNames').change(function() {
-    $.ajax({
-      url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages/',
-      type: 'GET',
-      contentType: 'application/json',
-      data: { 
-        'where': {'roomname': $(this).val()},
-        'order': '-createdAt' 
-      },
-      success: function (data) {
-        $('#chats').html('');
-        outputMessages(data);
-        $('.name').on('click', friendAdder); 
-      },
-      error: function (data) {
-        console.error('error');
-      }
-    });
+    var roomName = $(this).val();
+    generateMessages(roomName);
+    $('.name').on('click', friendAdder); 
   });
   
   //submits the message to the server
